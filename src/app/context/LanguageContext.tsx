@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { type Lang, t } from '../data/translations';
 
@@ -22,15 +24,20 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setLangState(l);
     document.documentElement.dir = t[l].dir;
     document.documentElement.lang = l;
+    localStorage.setItem('ks-lang', l);
   };
 
   useEffect(() => {
-    document.documentElement.dir = 'ltr';
-    document.documentElement.lang = 'en';
+    const saved = localStorage.getItem('ks-lang') as Lang;
+    if (saved && (saved === 'en' || saved === 'ar')) {
+      setLang(saved);
+    } else {
+      setLang('en');
+    }
   }, []);
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang, tr: t[lang], isRtl: lang === 'ar' }}>
+    <LanguageContext.Provider value={{ lang, setLang, tr: t[lang] || t['en'], isRtl: lang === 'ar' }}>
       {children}
     </LanguageContext.Provider>
   );
